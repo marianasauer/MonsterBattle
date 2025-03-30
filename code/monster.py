@@ -8,7 +8,6 @@ class Creature:
         self.health = self.max_health = MONSTER_DATA[name]['health']
         self.abilities = sample(list(ABILITIES_DATA.keys()), 4)
         self.name = name
-        print(self.name, self.element, self.abilities, self.health)
 
 
 class Monster(pygame.sprite.Sprite, Creature):
