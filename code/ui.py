@@ -3,13 +3,14 @@ import pygame
 from settings import *
 
 class UI:
-    def __init__(self, monster, player_monsters, simple_surfs):
+    def __init__(self, monster, player_monsters, simple_surfs, get_input):
         self.display_surface = pygame.display.get_surface()
         self.font = pygame.font.Font(None, 30)
         self.left = WINDOW_WIDTH / 2 - 100
         self.top = WINDOW_HEIGHT / 2 + 50
         self.monster = monster
         self.simple_surfs = simple_surfs
+        self.get_input = get_input
 
         #control
         self.general_options = ['attack', 'heal', 'switch', 'escape']
@@ -29,20 +30,33 @@ class UI:
             self.general_index['col'] = (self.general_index['col'] + int(keys[pygame.K_RIGHT]) - int(keys[pygame.K_LEFT])) % self.cols
             if keys[pygame.K_SPACE]:
                 self.state = self.general_options[self.general_index['col'] + self.general_index['row'] * 2]
+
         elif self.state == 'attack':
             self.attack_index['row'] = (self.attack_index['row'] + int(keys[pygame.K_DOWN]) - int(
                 keys[pygame.K_UP])) % self.rows
             self.attack_index['col'] = (self.attack_index['col'] + int(keys[pygame.K_RIGHT]) - int(
                 keys[pygame.K_LEFT])) % self.cols
             if keys[pygame.K_SPACE]:
-                print(self.monster.abilities[self.attack_index['col'] + self.attack_index['row'] * 2])
+                attack = self.monster.abilities[self.attack_index['col'] + self.attack_index['row'] * 2]
+                self.get_input(self.state, attack)
+                self.state = 'general'
 
         elif self.state == 'switch':
             self.switch_index =  (self.switch_index + int(keys[pygame.K_DOWN]) - int(
                 keys[pygame.K_UP])) % len(self.available_monsters)
+
             if keys[pygame.K_SPACE]:
-                print(self.available_monsters[self.switch_index])
-        if keys[pygame.K_SPACE]:
+                self.get_input(self.state, self.available_monsters[self.switch_index])
+                self.state = 'general'
+
+        elif self.state == 'heal':
+            self.get_input('heal')
+            self.state = 'general'
+
+        elif self.state == 'escape':
+            self.get_input('escape')
+
+        elif keys[pygame.K_SPACE]:
             self.state = 'general'
             self.general_index = {'col': 0, 'row': 0}
             self.attack_index = {'col': 0, 'row': 0}
